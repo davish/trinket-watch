@@ -110,6 +110,11 @@ void stopwatch() {
     int fractime;
     unsigned long inttime;
 
+    /*
+      davekw7x from Arduino forms wrote the code to get mins, secs, etc.
+      http://forum.arduino.cc/index.php?topic=18588.0
+    */
+
     inttime  = stopTime / 1000;
     fractime = stopTime % 1000;
     // inttime is the total number of number of seconds
