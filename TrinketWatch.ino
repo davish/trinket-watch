@@ -54,6 +54,12 @@ static const unsigned char PROGMEM logo16_glcd_bmp[] =
 #error("Height incorrect, please fix Adafruit_SSD1306.h!");
 #endif
 
+int hours = 9;
+int minutes = 50;
+
+unsigned long uptime = millis();
+unsigned long stopWatchStart = -1;
+
 void setup() {
  Serial.begin(9600);
 
@@ -66,10 +72,9 @@ void setup() {
   display.setTextSize(4);
   display.setTextColor(WHITE);
 }
-int hours = 9;
-int minutes = 50;
 
 void loop() {
+  uptime = millis();
   demo();
 }
 
@@ -95,4 +100,11 @@ void demo() {
   delay(200);
   
   minutes++;
+}
+
+void stopwatch() {
+  display.clearDisplay();
+  if (stopWatchStart != -1) {
+    unsigned long stopTime = uptime - stopWatchStart; 
+  }
 }
