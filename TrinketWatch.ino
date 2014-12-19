@@ -57,7 +57,6 @@ static const unsigned char PROGMEM logo16_glcd_bmp[] =
 int hours = 9;
 int minutes = 50;
 
-unsigned long uptime = millis();
 unsigned long stopWatchStart = -1;
 
 void setup() {
@@ -69,17 +68,16 @@ void setup() {
   delay(200);
   display.clearDisplay();
   // text display tests
-  display.setTextSize(4);
   display.setTextColor(WHITE);
 }
 
 void loop() {
-  uptime = millis();
   demo();
 }
 
 void demo() {
   display.clearDisplay();
+  display.setTextSize(4);
   if (minutes >= 60) {
     hours++;
     minutes = 0;
@@ -104,7 +102,54 @@ void demo() {
 
 void stopwatch() {
   display.clearDisplay();
+  display.setTextSize(2);
   if (stopWatchStart != -1) {
-    unsigned long stopTime = uptime - stopWatchStart; 
+    unsigned long stopTime = millis() - stopWatchStart; 
+
+    int days, hours, mins, secs;
+    int fractime;
+    unsigned long inttime;
+
+    inttime  = stopTime / 1000;
+    fractime = stopTime % 1000;
+    // inttime is the total number of number of seconds
+    // fractimeis the number of thousandths of a second
+
+    // number of days is total number of seconds divided by 24 divided by 3600
+    days     = inttime / (24*3600);
+    inttime  = inttime % (24*3600);
+
+    // Now, inttime is the remainder after subtracting the number of seconds
+    // in the number of days
+    hours    = inttime / 3600;
+    inttime  = inttime % 3600;
+
+    // Now, inttime is the remainder after subtracting the number of seconds
+    // in the number of days and hours
+    mins     = inttime / 60;
+    inttime  = inttime % 60;
+
+    // Now inttime is the number of seconds left after subtracting the number
+    // in the number of days, hours and minutes. In other words, it is the
+    // number of seconds.
+    secs = inttime;
+    
+    display.setCursor(5,10);
+    if (mins < 10)
+      display.print("0");
+    display.print(mins, DEC);
+    display.print(":");
+    if (secs < 10)
+      display.print("0");
+    display.print(secs, DEC);
+    display.print(":");
+    int centisec = (int)floor(fractime / 10);
+    if (centisec < 10)
+      display.print("0");
+    display.print(centisec);
+    display.println();
+    display.display();
   }
 }
+
+
