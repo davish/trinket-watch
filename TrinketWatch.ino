@@ -23,41 +23,16 @@ All text above, and the splash screen must be included in any redistribution
 
 #define OLED_RESET 4
 Adafruit_SSD1306 display(OLED_RESET);
-
-#define NUMFLAKES 10
-#define XPOS 0
-#define YPOS 1
-#define DELTAY 2
-
-
-#define LOGO16_GLCD_HEIGHT 16 
-#define LOGO16_GLCD_WIDTH  16 
-static const unsigned char PROGMEM logo16_glcd_bmp[] =
-{ B00000000, B11000000,
-  B00000001, B11000000,
-  B00000001, B11000000,
-  B00000011, B11100000,
-  B11110011, B11100000,
-  B11111110, B11111000,
-  B01111110, B11111111,
-  B00110011, B10011111,
-  B00011111, B11111100,
-  B00001101, B01110000,
-  B00011011, B10100000,
-  B00111111, B11100000,
-  B00111111, B11110000,
-  B01111100, B11110000,
-  B01110000, B01110000,
-  B00000000, B00110000 };
   
 #if (SSD1306_LCDHEIGHT != 64)
 #error("Height incorrect, please fix Adafruit_SSD1306.h!");
 #endif
 
-int hours = 9;
-int minutes = 50;
+
 
 unsigned long stopWatchStart = -1;
+int hours = 9;
+int minutes = 50;
 
 void setup() {
  Serial.begin(9600);
@@ -72,18 +47,28 @@ void setup() {
 }
 
 void loop() {
-  demo();
+  demo(); // update the time, now it's the demo but eventually it'll be a function calling the RTC
+  digitalTime(); // display the time in a digital format.
 }
 
 void demo() {
-  display.clearDisplay();
-  display.setTextSize(4);
   if (minutes >= 60) {
     hours++;
     minutes = 0;
   }
   if (hours > 23)
     hours = 1;
+  minutes++;
+}
+
+void updateButtonStates() {
+  
+}
+
+void digitalTime() {
+  display.clearDisplay();
+  display.setTextSize(4);
+
   if (hours < 10)
     display.setCursor(17,10);
   else
@@ -97,7 +82,6 @@ void demo() {
   display.display();
   delay(200);
   
-  minutes++;
 }
 
 void stopwatch() {
@@ -111,7 +95,7 @@ void stopwatch() {
     unsigned long inttime;
 
     /*
-      davekw7x from Arduino forms wrote the code to get mins, secs, etc.
+      davekw7x from Arduino forms wrote the code to get mins, secs, etc. from milliseconds.
       http://forum.arduino.cc/index.php?topic=18588.0
     */
 
