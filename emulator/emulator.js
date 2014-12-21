@@ -16,7 +16,21 @@ function initScreen(id){
 }
 
 function step() {
+  smile();
+}
 
+function smile() {
+  // face
+  gfx.drawCircle(64, 32, 10);
+
+  // eyes
+  drawPixel(60, 28);
+  drawPixel(68, 28);
+
+  // mouth
+  gfx.drawLine(60, 35, 68, 35);
+  drawPixel(60, 34);
+  drawPixel(68, 34);
 }
 
 function clearDisplay() {
