@@ -10,18 +10,12 @@ function initScreen(id){
   if (canvas.getContext){
     window.ctx = canvas.getContext('2d');
     clearDisplay();
-    // reset();
-    // drawGrid(SQUARE_SIZE); // For dev purposes
+    window.startTime = Date.now();
+    window.loop = setInterval(step, 1); // fastest delay between cycles in JS.
   }
 }
 
-function reset() {
-  window.loop = setInterval(step, 16.5);
-  
-}
-
 function step() {
-  // function called by setInterval() to move one step forward in game
 
 }
 
@@ -39,11 +33,6 @@ function drawPixel(x, y, inverted) {
   ctx.fillRect(x * SQUARE_SIZE, y * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE);
 }
 
-window.onkeydown = function(event) {
-  // clockwise starting from left arrow 37-40
-  // event handler
-}
-
 function drawGrid(interval) {
   // draw a grid with the interval between lines in px for dev purposes
   ctx.beginPath();
@@ -57,6 +46,10 @@ function drawGrid(interval) {
     ctx.lineTo(canvas.width, y);
   }
   ctx.stroke(); 
+}
+
+function millis() {
+  return Date.now() - startTime;
 }
 
 
