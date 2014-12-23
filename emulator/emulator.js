@@ -1,5 +1,6 @@
 window.SQUARE_SIZE = 5;
 
+var startTime = Date.now();
 function initScreen(id){
   // initialize the canvas and grid, with the width and height as parameters
   window.canvas = document.getElementById(id);
@@ -15,22 +16,156 @@ function initScreen(id){
   }
 }
 
+var last = millis();
 function step() {
-  smile();
+  if (millis() - last >= 20) {
+    clearDisplay();
+    pong();
+    last = millis();
+  }
+
+}
+
+var upPressed = false;
+var downPressed = false;
+
+window.onkeydown = function(e) {
+  if (e.which == 38) {
+    upPressed = true;
+  }
+  else if (e.which == 40) {
+    downPressed = true;
+  }
+};
+window.onkeyup = function(e) {
+  if (e.which == 38) {
+    upPressed = false;
+  }
+  else if (e.which == 40) {
+    downPressed = false;
+  }
+}
+
+var playerPos = 32;
+var cpuPos = 31;
+
+var ballDir = 1;
+var ballAngle = 0; // between 0 and 1; this way we can keep it on the screen
+var stepCount = 0;
+
+
+var ballC = [5, 32];
+
+function pong() {
+  if (upPressed) {
+    if (playerPos > 5)
+      playerPos--;
+  } 
+  else if (downPressed) {
+    if (playerPos < 58)
+      playerPos++;
+  }
+
+  buildField();
+  // bugs: when hitting the top wall, the ball just goes through.
+  // if you hit a side wall
+  if (ballC[1] == 0 || ballC[1] == 63) {
+    ballAngle *= -1;
+    ballC < 32 ? ballC[1] += 5 : ballC[1]--;
+    console.log("bounce!");
+  }
+
+  // if you hit a paddle
+  if (ballC[0] == 123 && Math.abs(playerPos-ballC[1]) <= 5) { 
+    ballDir *= -1;
+    switch(Math.abs(playerPos-ballC[1])) {
+      case 0:
+        ballAngle = 0;
+        break;
+      case 1:
+        ballAngle = .5;
+        break;
+      case 2:
+        ballAngle = .6;
+        break;
+      case 3:
+        ballAngle = .7;
+        break;
+      case 4:
+        ballAngle = .8;
+        break;
+      case 5:
+        ballAngle = .85;
+        break;
+    }
+    ballAngle *= (playerPos-ballC[1] >= 0 ? -1 : 1);
+  }
+  else if (ballC[0] == 4 && Math.abs(cpuPos-ballC[1]) <= 5) { // if u hit the CPU
+    ballDir *= -1; // bounce
+    switch(Math.abs(cpuPos-ballC[1])) {
+      case 0:
+        ballAngle = 0;
+        break;
+      case 1:
+        ballAngle = .5;
+        break;
+      case 2:
+        ballAngle = .6;
+        break;
+      case 3:
+        ballAngle = .7;
+        break;
+      case 4:
+        ballAngle = .8;
+        break;
+      case 5:
+        ballAngle = .85;
+        break;
+    }
+  }
+
+  if (ballC[0] > 128) { // player lost point
+    ballDir = 1;
+    ballC = [5, 32];
+  } 
+  else if (ballC[0] < 0) { // computer lost point
+    ballDir = -1;
+    ballC = [123, 32];
+  }
+
+  ballC[0] += ballDir;
+
+  if (stepCount >= Math.floor(1/Math.abs(ballAngle))) {
+    stepCount = 0;
+    ballC[1] += 1 * (ballAngle >= 0 ? 1 : -1);
+  }
+  stepCount++;
+
+  // ballC[1] += ballV[1];
+  display.drawPixel(ballC[0], ballC[1]);
+
+
+  display.drawLine(3, cpuPos-5, 3, cpuPos+5);
+  display.drawLine(124, playerPos-5, 124, playerPos+5)
+}
+
+function buildField() {
+  for (var i = 1; i < 63; i=i+2)
+    display.drawPixel(63, i);
 }
 
 function smile() {
   // face
-  display.drawCircle(64, 32, 10);
+  display.drawCircle(64, 32+dy, 10);
 
   // eyes
-  drawPixel(60, 28);
-  drawPixel(68, 28);
+  drawPixel(60, 28+dy);
+  drawPixel(68, 28+dy);
 
   // mouth
-  display.drawLine(60, 35, 68, 35);
-  drawPixel(60, 34);
-  drawPixel(68, 34);
+  display.drawLine(60, 35+dy, 68, 35+dy);
+  drawPixel(60, 34+dy);
+  drawPixel(68, 34+dy);
 }
 
 function clearDisplay() {
@@ -87,6 +222,7 @@ function millis() {
 */
 
 var display = {
+  drawPixel: drawPixel,
   drawCircle: function(x0, y0, r, color) {
     if (color)
       color = true;
