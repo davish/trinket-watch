@@ -18,12 +18,35 @@ function initScreen(id){
 
 var last = millis();
 function step() {
-  if (millis() - last >= 20) {
+  if (millis() - last >= 200) {
     clearDisplay();
-    pong();
+    analogTime();
+    // pong();
     last = millis();
   }
+}
 
+var minutes = [
+                [64, 10], [69, 11], // 12
+                [74, 12], [79, 16], // 1
+                [83, 20], [85, 26], // 2
+                [85, 32], [84, 38], // 3
+                [83, 43]] // 4
+
+
+var i = 0;
+function analogTime() {
+  display.drawCircle(64, 32, 30); // clock face
+  // display.drawCircle(64, 32, 22);
+  
+  display.drawLine(64,32,minutes[i % minutes.length][0], minutes[i% minutes.length][1]);  
+
+
+  i++;
+  // display.drawLine(64, 32, 85, 32);
+  // display.drawLine(64, 32, 84, 38);
+  // display.drawLine(64, 32, 83, 43);
+  // display.drawLine(64, 32, 75, 32);
 }
 
 var upPressed = false;
