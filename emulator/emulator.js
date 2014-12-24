@@ -96,6 +96,9 @@ ballDir = 1;
 ballAngle = -.5;
 ballC = [65, 62];
 
+var scorePlayer = 0;
+var scoreCPU = 0;
+
 function pong() {
   buildField();
   /*
@@ -139,7 +142,6 @@ function pong() {
   } else {
     movePaddles = true;
   }
-
 
   /*
     Logic for the ball
@@ -200,11 +202,17 @@ function pong() {
   }
 
   if (ballC[0] > 128) { // player lost point
+    scoreCPU++;
+    console.log("CPU:" + scoreCPU + " Player:" + scorePlayer);
+
     ballDir = -1;
     ballAngle = .5;
     ballC = [63, 1];
   } 
   else if (ballC[0] < 0) { // computer lost point
+    scorePlayer++;
+    console.log("CPU:" + scoreCPU + " Player:" + scorePlayer);
+
     ballDir = 1;
     ballAngle = -.5;
     ballC = [65, 62];
