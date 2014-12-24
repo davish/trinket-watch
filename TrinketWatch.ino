@@ -1,20 +1,20 @@
 /*********************************************************************
-This is an example for our Monochrome OLEDs based on SSD1306 drivers
-
-  Pick one up today in the adafruit shop!
-  ------> http://www.adafruit.com/category/63_98
-
-This example is for a 128x64 size display using I2C to communicate
-3 pins are required to interface (2 I2C and one reset)
-
-Adafruit invests time and resources providing this open source code, 
-please support Adafruit and open-source hardware by purchasing 
-products from Adafruit!
-
-Written by Limor Fried/Ladyada  for Adafruit Industries.  
-BSD license, check license.txt for more information
-All text above, and the splash screen must be included in any redistribution
-*********************************************************************/
+ * This is an example for our Monochrome OLEDs based on SSD1306 drivers
+ * 
+ * Pick one up today in the adafruit shop!
+ * ------> http://www.adafruit.com/category/63_98
+ * 
+ * This example is for a 128x64 size display using I2C to communicate
+ * 3 pins are required to interface (2 I2C and one reset)
+ * 
+ * Adafruit invests time and resources providing this open source code, 
+ * please support Adafruit and open-source hardware by purchasing 
+ * products from Adafruit!
+ * 
+ * Written by Limor Fried/Ladyada  for Adafruit Industries.  
+ * BSD license, check license.txt for more information
+ * All text above, and the splash screen must be included in any redistribution
+ *********************************************************************/
 
 #include <SPI.h>
 #include <Wire.h>
@@ -23,24 +23,38 @@ All text above, and the splash screen must be included in any redistribution
 
 #define OLED_RESET 4
 Adafruit_SSD1306 display(OLED_RESET);
-  
+
 #if (SSD1306_LCDHEIGHT != 64)
 #error("Height incorrect, please fix Adafruit_SSD1306.h!");
 #endif
 
 
-
+// Time Variables
 unsigned long stopWatchStart = -1;
 int hours = 9;
 int minutes = 50;
 
-void setup() {
- Serial.begin(9600);
+// Button Variables
 
+int bpins[] = {2, 2, 2};// pin 2 isn't exposed on the trinket, just a placeholder.
+int buttons[] = {0, 0, 0};
+int lastButtonStates[] = {0, 0, 0};
+long lastDebounceTimes[] = {0, 0, 0};
+long debounceDelay = 50;
+
+void setup() {
+  
+  // INPUT_PULLUP because it's one less wire to soler per switch;
+  // INPUT needs a connection to 3V and GND as well as the pin, INPUT_PULLUP you just attach to GND.
+  pinMode(bpins[0], INPUT_PULLUP); 
+  pinMode(bpins[1], INPUT_PULLUP);
+  pinMode(bpins[2], INPUT_PULLUP);
+  
+  Serial.begin(9600);
   // by default, we'll generate the high voltage from the 3.3v line internally! (neat!)
   display.begin(SSD1306_SWITCHCAPVCC, 0x3D);  // initialize with the I2C addr 0x3D (for the 128x64)
-  display.display();
-  delay(200);
+  display.display(); // display the splash screen that we have to
+  delay(500);
   display.clearDisplay();
   // text display tests
   display.setTextColor(WHITE);
@@ -51,94 +65,22 @@ void loop() {
   digitalTime(); // display the time in a digital format.
 }
 
-void demo() {
-  if (minutes >= 60) {
-    hours++;
-    minutes = 0;
-  }
-  if (hours > 23)
-    hours = 1;
-  minutes++;
-}
-
 void updateButtonStates() {
-  
-}
-
-void digitalTime() {
-  display.clearDisplay();
-  display.setTextSize(4);
-
-  if (hours < 10)
-    display.setCursor(17,10);
-  else
-    display.setCursor(5,10);
-  display.print(hours, DEC);
-  display.print(":");
-  if (minutes < 10)
-    display.print("0");
-  display.print(minutes, DEC);
-  display.println();
-  display.display();
-  delay(200);
-  
-}
-
-void stopwatch() {
-  display.clearDisplay();
-  display.setTextSize(2);
-  if (stopWatchStart != -1) {
-    unsigned long stopTime = millis() - stopWatchStart; 
-
-    int days, hours, mins, secs;
-    int fractime;
-    unsigned long inttime;
-
-    /*
-      davekw7x from Arduino forms wrote the code to get mins, secs, etc. from milliseconds.
-      http://forum.arduino.cc/index.php?topic=18588.0
-    */
-
-    inttime  = stopTime / 1000;
-    fractime = stopTime % 1000;
-    // inttime is the total number of number of seconds
-    // fractimeis the number of thousandths of a second
-
-    // number of days is total number of seconds divided by 24 divided by 3600
-    days     = inttime / (24*3600);
-    inttime  = inttime % (24*3600);
-
-    // Now, inttime is the remainder after subtracting the number of seconds
-    // in the number of days
-    hours    = inttime / 3600;
-    inttime  = inttime % 3600;
-
-    // Now, inttime is the remainder after subtracting the number of seconds
-    // in the number of days and hours
-    mins     = inttime / 60;
-    inttime  = inttime % 60;
-
-    // Now inttime is the number of seconds left after subtracting the number
-    // in the number of days, hours and minutes. In other words, it is the
-    // number of seconds.
-    secs = inttime;
-    
-    display.setCursor(5,10);
-    if (mins < 10)
-      display.print("0");
-    display.print(mins, DEC);
-    display.print(":");
-    if (secs < 10)
-      display.print("0");
-    display.print(secs, DEC);
-    display.print(":");
-    int centisec = (int)floor(fractime / 10);
-    if (centisec < 10)
-      display.print("0");
-    display.print(centisec);
-    display.println();
-    display.display();
+  for (int i = 0; i < 3; ++i) {
+    int reading = digitalRead(bpins[i]);
+    if (reading != lastButtonStates[i]) {
+      lastDebounceTimes[i] = millis();
+    }
+    if ((millis() - lastDebounceTimes[i]) > debounceDelay) {
+      if (reading == LOW) {
+       buttons[i] = 1;
+      } else {
+       buttons[i] = 0;
+      } 
+    }
+    lastButtonStates[i] = reading;
   }
 }
+
 
 
