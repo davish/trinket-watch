@@ -18,10 +18,10 @@ function initScreen(id){
 
 var last = millis();
 function step() {
-  if (millis() - last >= 200) {
+  if (millis() - last >= 15) {
     clearDisplay();
-    analogTime();
-    // pong();
+    // analogTime();
+    pong();
     last = millis();
   }
 }
@@ -31,7 +31,15 @@ var minutes = [
                 [74, 12], [79, 16], // 1
                 [83, 20], [85, 26], // 2
                 [85, 32], [84, 38], // 3
-                [83, 43]] // 4
+                [83, 43], [], // 4
+                [], [], // 5
+                [], [], // 6
+                [], [], // 7
+                [], [], // 8
+                [], [], // 9
+                [], [], // 10
+                [], [], // 11
+                ]
 
 
 var i = 0;
@@ -39,7 +47,7 @@ function analogTime() {
   display.drawCircle(64, 32, 30); // clock face
   // display.drawCircle(64, 32, 22);
   
-  display.drawLine(64,32,minutes[i % minutes.length][0], minutes[i% minutes.length][1]);  
+  // display.drawLine(64,32,minutes[i % minutes.length][0], minutes[i% minutes.length][1]);  
 
 
   i++;
@@ -70,36 +78,79 @@ window.onkeyup = function(e) {
 }
 
 var playerPos = 32;
-var cpuPos = 31;
 
-var ballDir = 1;
+var ballDir = -1;
 var ballAngle = 0; // between 0 and 1; this way we can keep it on the screen
 var stepCount = 0;
 
+var ballC = [20, 32];
 
-var ballC = [5, 32];
+var movePaddles = true;
+
+var cpuPos = 34;
+var cpuDir = 1;
+
+var strategy = false;
+
+ballDir = 1;
+ballAngle = -.5;
+ballC = [65, 62];
 
 function pong() {
-  if (upPressed) {
-    if (playerPos > 5)
-      playerPos--;
-  } 
-  else if (downPressed) {
-    if (playerPos < 58)
-      playerPos++;
+  buildField();
+  /*
+    Paddle Logic, runs once for every step for the ball.
+  */
+  if (movePaddles) {
+    if (upPressed) {
+      if (playerPos > 5)
+        playerPos--;
+    } 
+    else if (downPressed) {
+      if (playerPos < 58)
+        playerPos++;
+    }
+
+    if (cpuPos > ballC[1] && cpuPos > 5)
+      cpuPos--;
+    else if (cpuPos < ballC[1] && cpuPos < 58)
+      cpuPos++;
+    else {
+      cpuPos = cpuPos;
+
+      /*if (ballDir > 0) { // ball's heading away from us
+        strategy = false; // just let it ride
+        cpuPos = cpuPos;
+      } else {
+        strategy = true;
+        if (true && cpuPos > 5 && cpuPos < 58) { // Math.abs(playerPos - cpuPos) < 15
+          if (Math.abs(cpuPos - ballC[1]) < 3 || Math.abs(cpuPos - ballC[1]) > 3) {
+            console.log(Math.abs(cpuPos - ballC[1]));
+            cpuPos += (Math.abs(playerPos - ballC[1]) > 0 ? 1 : -1);
+          } else {
+            cpuPos = cpuPos;
+          }
+        } else {
+          cpuPos = cpuPos; // the player might be too far away to catch it in time, so hit it straight.
+        }
+      } */
+    }
+    movePaddles = false;
+  } else {
+    movePaddles = true;
   }
 
-  buildField();
-  // bugs: when hitting the top wall, the ball just goes through.
-  // if you hit a side wall
+
+  /*
+    Logic for the ball
+  */
   if (ballC[1] == 0 || ballC[1] == 63) {
     ballAngle *= -1;
-    ballC < 32 ? ballC[1] += 5 : ballC[1]--;
-    console.log("bounce!");
+    ballC[1] += (ballC[1] > 32 ? -1 : 1);
   }
 
-  // if you hit a paddle
-  if (ballC[0] == 123 && Math.abs(playerPos-ballC[1]) <= 5) { 
+  // if it hits a paddle
+  if (ballC[0] == 123 && Math.abs(playerPos-ballC[1]) <= 5) {  // player
     ballDir *= -1;
     switch(Math.abs(playerPos-ballC[1])) {
       case 0:
@@ -145,15 +196,18 @@ function pong() {
         ballAngle = .85;
         break;
     }
+    ballAngle *= (cpuPos-ballC[1] >= 0 ? -1 : 1);
   }
 
   if (ballC[0] > 128) { // player lost point
-    ballDir = 1;
-    ballC = [5, 32];
+    ballDir = -1;
+    ballAngle = .5;
+    ballC = [63, 1];
   } 
   else if (ballC[0] < 0) { // computer lost point
-    ballDir = -1;
-    ballC = [123, 32];
+    ballDir = 1;
+    ballAngle = -.5;
+    ballC = [65, 62];
   }
 
   ballC[0] += ballDir;
@@ -164,9 +218,7 @@ function pong() {
   }
   stepCount++;
 
-  // ballC[1] += ballV[1];
   display.drawPixel(ballC[0], ballC[1]);
-
 
   display.drawLine(3, cpuPos-5, 3, cpuPos+5);
   display.drawLine(124, playerPos-5, 124, playerPos+5)
