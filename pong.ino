@@ -6,7 +6,7 @@ Should be fun.
 int playerPos = 32;
 
 int ballDir = 1;
-int ballAngle = -1;
+float ballAngle = -1;
 int stepCount = 0;
 
 int ballC[] = {65, 62};
@@ -41,7 +41,7 @@ void pong() {
     else {
       cpuPos = cpuPos;
     }
-//    movePaddles = false;
+    movePaddles = false;
   } else {
     movePaddles = true;
   }
@@ -50,12 +50,17 @@ void pong() {
     Logic for the ball
   */
   if (ballC[1] == 0 || ballC[1] == 63) { // if it hits a wall
-    ballAngle *= -1;
+    Serial.println("Before");
+    Serial.println(ballAngle);
+    Serial.println(ballC[1]);
+    ballAngle *= -1; // bounce
     ballC[1] += (ballC[1] > 32 ? -1 : 1);
+    Serial.println("After");
+    Serial.println(ballAngle);
+    Serial.println(ballC[1]);
+    Serial.println();
   }
   
-  
-  Serial.println(ballAngle, DEC);
   // if it hits a paddle
   if (ballC[0] == 123 && abs(playerPos-ballC[1]) <= 5) {  // player
     ballDir *= -1;
@@ -135,11 +140,17 @@ void pong() {
 
   display.drawLine(3, cpuPos-5, 3, cpuPos+5, WHITE);
   display.drawLine(124, playerPos-5, 124, playerPos+5, WHITE);
+  
+  display.setTextSize(2);
+  display.setCursor(30, 0);
+  display.print(CPUScore, DEC);
+  display.setCursor(96, 0);
+  display.println(playerScore, DEC);
+  
   display.display();
 }
 
 void buildField() {
-  Serial.println("BUILDING");
   for (int i = 1; i < 63; i=i+2)
     display.drawPixel(63, i, WHITE);
 }
