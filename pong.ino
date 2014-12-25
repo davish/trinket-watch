@@ -6,13 +6,13 @@ Should be fun.
 int playerPos = 32;
 
 int ballDir = 1;
-int ballAngle = -.5;
+int ballAngle = -1;
 int stepCount = 0;
 
 int ballC[] = {65, 62};
 
 int cpuPos = 32;
-int cpuDir = 1;
+int cpuDir = 0;
 
 int playerScore = 0;
 int CPUScore = 0;
@@ -40,25 +40,8 @@ void pong() {
       cpuPos++;
     else {
       cpuPos = cpuPos;
-
-      /*if (ballDir > 0) { // ball's heading away from us
-        strategy = false; // just let it ride
-        cpuPos = cpuPos;
-      } else {
-        strategy = true;
-        if (true && cpuPos > 5 && cpuPos < 58) { // Math.abs(playerPos - cpuPos) < 15
-          if (Math.abs(cpuPos - ballC[1]) < 3 || Math.abs(cpuPos - ballC[1]) > 3) {
-            console.log(Math.abs(cpuPos - ballC[1]));
-            cpuPos += (Math.abs(playerPos - ballC[1]) > 0 ? 1 : -1);
-          } else {
-            cpuPos = cpuPos;
-          }
-        } else {
-          cpuPos = cpuPos; // the player might be too far away to catch it in time, so hit it straight.
-        }
-      } */
     }
-    movePaddles = false;
+//    movePaddles = false;
   } else {
     movePaddles = true;
   }
@@ -66,11 +49,13 @@ void pong() {
   /*
     Logic for the ball
   */
-  if (ballC[1] == 0 || ballC[1] == 63) {
+  if (ballC[1] == 0 || ballC[1] == 63) { // if it hits a wall
     ballAngle *= -1;
     ballC[1] += (ballC[1] > 32 ? -1 : 1);
   }
-
+  
+  
+  Serial.println(ballAngle, DEC);
   // if it hits a paddle
   if (ballC[0] == 123 && abs(playerPos-ballC[1]) <= 5) {  // player
     ballDir *= -1;
@@ -150,9 +135,11 @@ void pong() {
 
   display.drawLine(3, cpuPos-5, 3, cpuPos+5, WHITE);
   display.drawLine(124, playerPos-5, 124, playerPos+5, WHITE);
+  display.display();
 }
 
 void buildField() {
+  Serial.println("BUILDING");
   for (int i = 1; i < 63; i=i+2)
     display.drawPixel(63, i, WHITE);
 }

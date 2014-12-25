@@ -2,6 +2,8 @@
  * The code that keeps the time, displays it, plus a demo function to just run the clock up.
  * Stopwatch included.
 */
+int hours = 1;
+int minutes = 0;
 
 void demo() {
   if (minutes >= 60) {
@@ -14,7 +16,7 @@ void demo() {
 }
 
 void digitalTime() {
-  display.clearDisplay();
+//  display.clearDisplay();
   display.setTextSize(4);
 
   if (hours < 10)
@@ -31,59 +33,49 @@ void digitalTime() {
   delay(200);
 }
 
-void stopwatch() {
-  display.clearDisplay();
-  display.setTextSize(2);
-  if (stopWatchStart != -1) {
-    unsigned long stopTime = millis() - stopWatchStart; 
 
-    int days, hours, mins, secs;
-    int fractime;
-    unsigned long inttime;
+int mins[][2] = {
+                {64, 10}, {69, 11}, // :00
+                {74, 12}, {79, 16}, // :05
+                {83, 20}, {85, 26}, // :10
+                {85, 32}, {84, 38}, // :15
+                {83, 43}, {78, 49}, // :20
+                {73, 52}, {68, 53}, // :25
+                {64, 54}, {59, 53}, // :30
+                {55, 52}, {50, 47}, // :35
+                {45, 43}, {43, 38}, // :40
+                {42, 32}, {44, 26}, // :45
+                {45, 20}, {50, 16}, // :50
+                {53, 14}, {59, 12}  // :55
+};
+           
+int hors[][2] = {  
+                {70, 23}, // 1
+                {73, 27}, // 2
+                {75, 32}, // 3
+                {73, 37}, // 4
+                {70, 42}, // 5
+                {64, 43}, // 6
+                {58, 40}, // 7
+                {55, 37}, // 8
+                {53, 32}, // 9
+                {54, 27}, // 10
+                {59, 24}, // 11
+                {64, 21} // 12
+};
 
-    /*
-      davekw7x from Arduino forms wrote the code to get mins, secs, etc. from milliseconds.
-     http://forum.arduino.cc/index.php?topic=18588.0
-     */
 
-    inttime  = stopTime / 1000;
-    fractime = stopTime % 1000;
-    // inttime is the total number of number of seconds
-    // fractimeis the number of thousandths of a second
-
-    // number of days is total number of seconds divided by 24 divided by 3600
-    days     = inttime / (24*3600);
-    inttime  = inttime % (24*3600);
-
-    // Now, inttime is the remainder after subtracting the number of seconds
-    // in the number of days
-    hours    = inttime / 3600;
-    inttime  = inttime % 3600;
-
-    // Now, inttime is the remainder after subtracting the number of seconds
-    // in the number of days and hours
-    mins     = inttime / 60;
-    inttime  = inttime % 60;
-
-    // Now inttime is the number of seconds left after subtracting the number
-    // in the number of days, hours and minutes. In other words, it is the
-    // number of seconds.
-    secs = inttime;
-
-    display.setCursor(5,10);
-    if (mins < 10)
-      display.print("0");
-    display.print(mins, DEC);
-    display.print(":");
-    if (secs < 10)
-      display.print("0");
-    display.print(secs, DEC);
-    display.print(":");
-    int centisec = (int)floor(fractime / 10);
-    if (centisec < 10)
-      display.print("0");
-    display.print(centisec);
-    display.println();
-    display.display();
-  }
+void analogTime() {
+  display.drawCircle(64, 32, 27, WHITE); // clock face
+//  int mi = round((minutes/60*24)%23)%60;
+  int mi = round(minutes/60.0*23.0);
+  int hi = hours - 1;
+  
+  display.drawLine(64, 32, mins[mi][0], mins[mi][1], WHITE);
+  display.drawLine(64, 32, hors[hi%12][0], hors[hi%12][1], WHITE);
+  display.setCursor(0, 0);
+  display.setTextSize(1);
+  display.println(mi, DEC);
+  
+  display.display();
 }

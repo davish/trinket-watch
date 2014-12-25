@@ -29,18 +29,17 @@ Adafruit_SSD1306 display(OLED_RESET);
 #endif
 
 
-// Time Variables
-unsigned long stopWatchStart = -1;
-int hours = 9;
-int minutes = 50;
 
 // Button Variables
 
-int bpins[] = {2, 2, 2};// pin 2 isn't exposed on the trinket, just a placeholder.
+int bpins[] = {8, 9, 10};// pin 2 isn't exposed on the trinket, just a placeholder.
 int buttons[] = {0, 0, 0};
 int lastButtonStates[] = {0, 0, 0};
 long lastDebounceTimes[] = {0, 0, 0};
 long debounceDelay = 50;
+
+long last = millis();
+int lastReadings[] = {0,0,0};
 
 void setup() {
   
@@ -58,12 +57,66 @@ void setup() {
   display.clearDisplay();
   // text display tests
   display.setTextColor(WHITE);
+  
 }
 
+int mnu = 0;
+int timeMode = 0;
+
+
 void loop() {
-  demo(); // update the time, now it's the demo but eventually it'll be a function calling the RTC
-  digitalTime(); // display the time in a digital format.
+  if (pressedOnce(1)) {
+    mnu = (mnu + 1) % 2;
+  }
+  if (mnu == 0) {
+    if (pressedOnce(0)) {
+      timeMode = abs(timeMode-1) % 2;
+    } else if (pressedOnce(2)) {
+      timeMode = abs(timeMode+1) % 2;
+    }
+    if (millis() - last >= 40) {
+      display.clearDisplay();
+      demo();
+      if (timeMode == 0)
+        analogTime();
+      else if (timeMode == 1)
+        digitalTime();
+      last = millis(); 
+    }
+  }
+  else if (mnu == 1) {
+    display.clearDisplay();
+    pong();
+  }  
 }
+
+void menu() {
+  boolean b = true;
+  display.setTextSize(1);
+  int m = 0;
+  while (b) {
+    display.clearDisplay();
+    display.setCursor(0, 0);
+    display.println("Time\nPong");
+    if (pressedOnce(0))
+      m = abs(m-1) % 2;
+    else if (pressedOnce(2))
+      m = abs(m+1) % 2;
+    else if (pressedOnce(1))
+      Serial.println(m);
+    
+    
+    if (m == 0) {
+      display.setCursor(30, 0);
+    }
+    else {
+      display.setCursor(30, 10);
+    }
+    display.println("*");
+    display.display();
+  }
+}
+
 
 void updateButtonStates() {
   for (int i = 0; i < 3; ++i) {
@@ -82,5 +135,13 @@ void updateButtonStates() {
   }
 }
 
-
-
+boolean pressedOnce(int b) {
+  updateButtonStates();
+  boolean r;
+  if (buttons[b] != lastReadings[b] && buttons[b])
+    r = true;
+  else
+    r = false;
+  lastReadings[b] = buttons[b];
+  return r;
+}

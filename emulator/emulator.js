@@ -18,43 +18,66 @@ function initScreen(id){
 
 var last = millis();
 function step() {
-  if (millis() - last >= 15) {
+  if (millis() - last >= 10) {
     clearDisplay();
+    // demo();
     // analogTime();
     pong();
     last = millis();
   }
 }
 
-var minutes = [
-                [64, 10], [69, 11], // 12
-                [74, 12], [79, 16], // 1
-                [83, 20], [85, 26], // 2
-                [85, 32], [84, 38], // 3
-                [83, 43], [], // 4
-                [], [], // 5
-                [], [], // 6
-                [], [], // 7
-                [], [], // 8
-                [], [], // 9
-                [], [], // 10
-                [], [], // 11
-                ]
+var m = [
+                [64, 10], [69, 11], // :00
+                [74, 12], [79, 16], // :05
+                [83, 20], [85, 26], // :10
+                [85, 32], [84, 38], // :15
+                [83, 43], [78, 49], // :20
+                [73, 52], [68, 53], // :25
+                [64, 54], [59, 53], // :30
+                [55, 52], [50, 47], // :35
+                [45, 43], [43, 38], // :40
+                [42, 32], [44, 26], // :45
+                [45, 20], [50, 16], // :50
+                [53, 14], [59, 12]  // :55
+              ];
 
 
-var i = 0;
+var h = [  
+                [70, 23], // 1
+                [73, 27], // 2
+                [75, 32], // 3
+                [73, 37], // 4
+                [70, 42], // 5
+                [64, 43], // 6
+                [58, 40], // 7
+                [55, 37], // 8
+                [53, 32], // 9
+                [54, 27], // 10
+                [59, 24], // 11
+                [64, 21] // 12
+]
+
+var hours = 12;
+var minutes = 0;
 function analogTime() {
-  display.drawCircle(64, 32, 30); // clock face
-  // display.drawCircle(64, 32, 22);
-  
-  // display.drawLine(64,32,minutes[i % minutes.length][0], minutes[i% minutes.length][1]);  
+  display.drawCircle(64, 32, 27); // clock face
 
+  var mi = Math.round((minutes/60*24)%23);
+  var hi = hours - 1;
 
-  i++;
-  // display.drawLine(64, 32, 85, 32);
-  // display.drawLine(64, 32, 84, 38);
-  // display.drawLine(64, 32, 83, 43);
-  // display.drawLine(64, 32, 75, 32);
+  display.drawLine(64, 32, m[mi%60][0], m[mi%60][1]);
+  display.drawLine(64, 32, h[hi%12][0], h[hi%12][1]);
+}
+
+function demo() {
+  if (minutes >= 60) {
+    hours++;
+    minutes = 0;
+  }
+  if (hours > 23)
+    hours = 1;
+  minutes++;
 }
 
 var upPressed = false;
@@ -252,7 +275,6 @@ function smile() {
 }
 
 function clearDisplay() {
-  // reset all blocks to white except for the boundaries
   for (var x = 0; x < grid_width; x++) {
     for(var y = 0; y < grid_height; y++) {
       drawPixel(x,y, true);
@@ -302,6 +324,18 @@ function millis() {
   - Redistributions in binary form must reproduce the above copyright notice,
     this list of conditions and the following disclaimer in the documentation
     and/or other materials provided with the distribution.
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+  ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+  LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+  POSSIBILITY OF SUCH DAMAGE.
+
 */
 
 var display = {
