@@ -72,5 +72,4 @@ void stopwatch() {
     display.print("0");
   display.print(centisec);
   display.println();
-  display.display();
 }

@@ -146,8 +146,6 @@ void pong() {
   display.print(CPUScore, DEC);
   display.setCursor(96, 0);
   display.println(playerScore, DEC);
-  
-  display.display();
 }
 
 void buildField() {

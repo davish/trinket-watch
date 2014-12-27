@@ -2,8 +2,6 @@
  * The code that keeps the time, displays it, plus a demo function to just run the clock up.
  * Stopwatch included.
 */
-int hours = 1;
-int minutes = 0;
 
 void demo() {
   if (minutes >= 60) {
@@ -15,22 +13,62 @@ void demo() {
   minutes++;
 }
 
+//void updateTime() {
+//  DateTime now = rtc.now();
+//  hours = now.hour();
+//  minutes = now.minute();
+//  seconds = now.second();
+//  display.setTextSize(1);
+//  display.setCursor(0,0);
+//  display.print(now.unixtime());
+//  display.display();
+//}
+
+
+void updateInternalTime() {
+  ms += millis() - sinceLast;
+  sinceLast = millis();
+  if (ms >= 1000) {
+    seconds += ms / 1000;
+    ms = ms % 1000;
+  }
+  if (seconds >= 60) {
+    minutes += seconds/60;
+    seconds = seconds % 60;
+  }
+  if (minutes >= 60) {
+    hours += minutes / 60;
+    minutes = minutes % 60;
+  }
+  if (hours >= 24) {
+    hours = 0;
+  }
+}
+
+void timeTest() {
+}
 void digitalTime() {
 //  display.clearDisplay();
   display.setTextSize(4);
 
-  if (hours < 10)
+  int h = hours % 12;
+  if (h == 0) h = 12;
+
+  if (h < 10)
     display.setCursor(17,10);
   else
     display.setCursor(5,10);
-  display.print(hours, DEC);
+  
+  display.print(h%12, DEC);
   display.print(":");
   if (minutes < 10)
     display.print("0");
   display.print(minutes, DEC);
   display.println();
-  display.display();
-  delay(200);
+  
+  display.setCursor(110, 50);
+  display.setTextSize(1);
+  display.print(seconds, DEC);
 }
 
 
@@ -73,9 +111,7 @@ void analogTime() {
   
   display.drawLine(64, 32, mins[mi][0], mins[mi][1], WHITE);
   display.drawLine(64, 32, hors[hi%12][0], hors[hi%12][1], WHITE);
-  display.setCursor(0, 0);
+  display.setCursor(110, 50);
   display.setTextSize(1);
-  display.println(mi, DEC);
-  
-  display.display();
+  display.print(seconds, DEC);
 }
