@@ -13,18 +13,6 @@ void demo() {
   minutes++;
 }
 
-//void updateTime() {
-//  DateTime now = rtc.now();
-//  hours = now.hour();
-//  minutes = now.minute();
-//  seconds = now.second();
-//  display.setTextSize(1);
-//  display.setCursor(0,0);
-//  display.print(now.unixtime());
-//  display.display();
-//}
-
-
 void updateInternalTime() {
   ms += millis() - sinceLast;
   sinceLast = millis();
@@ -45,8 +33,6 @@ void updateInternalTime() {
   }
 }
 
-void timeTest() {
-}
 void digitalTime() {
 //  display.clearDisplay();
   display.setTextSize(4);
@@ -59,7 +45,7 @@ void digitalTime() {
   else
     display.setCursor(5,10);
   
-  display.print(h%12, DEC);
+  display.print(h, DEC);
   display.print(":");
   if (minutes < 10)
     display.print("0");
@@ -69,6 +55,8 @@ void digitalTime() {
   display.setCursor(110, 50);
   display.setTextSize(1);
   display.print(seconds, DEC);
+  display.setCursor(0, 50);
+  display.print((hours > 11) ? "PM" : "AM");
 }
 
 
@@ -88,6 +76,7 @@ int mins[][2] = {
 };
            
 int hors[][2] = {  
+                {64, 21}, // 12
                 {70, 23}, // 1
                 {73, 27}, // 2
                 {75, 32}, // 3
@@ -98,8 +87,8 @@ int hors[][2] = {
                 {55, 37}, // 8
                 {53, 32}, // 9
                 {54, 27}, // 10
-                {59, 24}, // 11
-                {64, 21} // 12
+                {59, 24} // 11
+                
 };
 
 
@@ -107,11 +96,14 @@ void analogTime() {
   display.drawCircle(64, 32, 27, WHITE); // clock face
 //  int mi = round((minutes/60*24)%23)%60;
   int mi = round(minutes/60.0*23.0);
-  int hi = hours - 1;
+  int hi = (hours % 12);
   
   display.drawLine(64, 32, mins[mi][0], mins[mi][1], WHITE);
-  display.drawLine(64, 32, hors[hi%12][0], hors[hi%12][1], WHITE);
+  display.drawLine(64, 32, hors[hi][0], hors[hi%12][1], WHITE);
   display.setCursor(110, 50);
   display.setTextSize(1);
   display.print(seconds, DEC);
+  
+  display.setCursor(0, 50);
+  display.print((hours > 11) ? "PM" : "AM");
 }

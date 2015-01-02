@@ -86,7 +86,7 @@ void loop() {
   display.clearDisplay();
   
   if (pressedOnce(1)) {
-    mnu = (mnu + 1) % 3;
+    mnu = (mnu + 1) % 4;
   }
   if (mnu == 0) {
     if (pressedOnce(0)) {
@@ -104,8 +104,12 @@ void loop() {
   }
   else if (mnu == 1) {
     pong();
-  } else if (mnu == 2) {
+  } 
+  else if (mnu == 2) {
     stopwatch();
+  }
+  else if (mnu == 3) {
+    adjustTime();
   }
   display.display();
 }
